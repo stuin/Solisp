@@ -38,14 +38,15 @@ Passed Fail)
 (If (== ((Set add {{x y} (+ x y)}) 2 3) 5)
 Passed Fail)
 
-#Attempting to create recursion
-((Set fact {
-	x
+#Succesfull recursive function
+(If (== ((Set fact {
+	{x}
 	(If (> x 0)
-		(+ x (Rec (- x 1)))
+		(+ x (fact (- x 1)))
 		0
 	)
-}) 3)
+}) 4) 10)
+Passed Fail)
 
 #Weird formatting test
 (If#Testing

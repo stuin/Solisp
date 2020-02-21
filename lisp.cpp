@@ -18,10 +18,11 @@ builtin Enviroment::build_function(sexpr func) {
 				pos--;
 				DONE;
 			}
-			env->set(env->str_eval(c), *pos++);
-		}
 
-		//std::cout << "func: " << env->str_eval(cell(func, LIST), true) << "\n";
+			//Prevent infinite loops
+			if(env->str_eval(c, true) != env->str_eval(*pos, true))
+				env->set(env->str_eval(c, true), *pos++);
+		}
 
 		cell output = env->eval(func[1]);
 		env->shift_env(false);
@@ -263,9 +264,7 @@ builtin Enviroment::function_eval(cell const &c) {
 			if(var != NULL)
 				return function_eval(*var);
 		case LIST:
-			builtin func = build_function(std::get<sexpr>(c.content));
-			set("recursive", cell(func, FUNCTION));
-			return func;
+			return build_function(std::get<sexpr>(c.content));
 	}
 	CONVERTERROR("function");
 }

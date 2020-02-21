@@ -204,19 +204,6 @@ void Enviroment::build_library() {
 		DONE;
 		return output;
 	}));
-	set("Rec", cell([](Enviroment *env, marker pos, marker end) {
-		LISTREMAINS;
-		sexpr output;
-
-		std::cout << "Recursive call started\n";
-		output.push_back(*env->get("recursive"));
-		while(pos != end)
-			output.push_back(*pos++);
-
-		//env->set("recursive", 0);
-
-		return cell(output, LIST);
-	}));
 
 
 	//Universal comparisons
