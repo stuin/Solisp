@@ -8,15 +8,15 @@
 	(* 5 1)
 	(/ 20 4)
 	(% 15 10)
-) Passed Failed)
+) Passed Fail)
 
 #Summing up lists
 (If (< (Eval {+ (Set list {1 2 3 4 5})}) 20) #{+ 1 2 3 4 5}
-Passed Failed)
+Passed Fail)
 
 #Mapping loops and product of a list
 (If (Eval * (Map list i (!= i 0)))
-Passed Failed)
+Passed Fail)
 
 #General list modifying
 (Join (Remove , (Join (Reverse "e,d" s s a P) ,)))
@@ -32,10 +32,22 @@ Passed Failed)
 			yes
 		}))
 	)
-Passed Failed)
+Passed Fail)
 
+#Basic user-defined function
+(If (== ((Set add {{x y} (+ x y)}) 2 3) 5)
+Passed Fail)
+
+#Attempting to create recursion
+((Set fact {
+	x
+	(If (> x 0)
+		(+ x (Rec (- x 1)))
+		0
+	)
+}) 3)
 
 #Weird formatting test
 (If#Testing
-1(Join 		 {Pass ed})"Failed"
+1(Join 		 {Pass ed})"Fail"
 )

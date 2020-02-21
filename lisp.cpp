@@ -5,6 +5,30 @@
  * Lisp type convertions and definitions
  */
 
+//Define function from list
+builtin Enviroment::build_function(sexpr func) {
+	return [func](Enviroment *env, marker pos, marker end) {
+		sexpr vars = env->list_eval(func[0]);
+		LISTREMAINS;
+		env->shift_env(true);
+
+		//Set function variables
+		for(cell c : vars) {
+			if(pos == end) {
+				pos--;
+				DONE;
+			}
+			env->set(env->str_eval(c), *pos++);
+		}
+
+		//std::cout << "func: " << env->str_eval(cell(func, LIST), true) << "\n";
+
+		cell output = env->eval(func[1]);
+		env->shift_env(false);
+		return output;
+	};
+}
+
 //Variable retrieval
 cell *Enviroment::get(string s) {
 	//Check each enviroment layer for value
@@ -52,7 +76,7 @@ cell Enviroment::eval(sexpr const &s) {
 		throw std::domain_error("Empty sexpr");
 
 	//Search library for function
-	return function_eval(*s.begin())(this, ++s.begin(), s.end());
+	return eval(function_eval(*s.begin())(this, ++s.begin(), s.end()));
 }
 
 //Convert to string
@@ -62,11 +86,10 @@ string Enviroment::str_eval(cell const &c, bool literal) {
 
 	string output;
 	sexpr array;
+	cell *var;
 	switch(c.type) {
 		case NUMBER:
 			return std::to_string(std::get<int>(c.content));
-		case CHAR:
-			return string(1, std::get<int>(c.content));
 		case FUNCTION:
 			return "f";
 		case LIST: case EXPR:
@@ -74,11 +97,20 @@ string Enviroment::str_eval(cell const &c, bool literal) {
 			for(cell s : array)
 				output += str_eval(s, literal) + " ";
 			return output;
+		case CHAR:
+			output = string(1, std::get<int>(c.content));
+
+			//Check if variable
+			var = get(output);
+			if(!literal && var != NULL)
+				return str_eval(*var);
+
+			return output;
 		case STRING:
 			output = std::get<string>(c.content);
 
 			//Check if variable
-			cell *var = get(output);
+			var = get(output);
 			if(!literal && var != NULL)
 				return str_eval(*var);
 
@@ -94,13 +126,21 @@ string Enviroment::str_eval_cont(cell const &c, bool literal) {
 
 //Convert to number
 int Enviroment::num_eval(cell const &c) {
+	cell *var;
 	switch(c.type) {
 		case EXPR:
 			return num_eval(eval(c));
-		case NUMBER: case CHAR:
+		case NUMBER:
 			return std::get<int>(c.content);
 		case LIST:
 			return std::get<sexpr>(c.content).size();
+		case CHAR:
+			//Check if variable
+			var = get(string(1, std::get<int>(c.content)));
+			if(var != NULL)
+				return num_eval(*var);
+
+			return std::get<int>(c.content);
 		case STRING:
 			string s = std::get<string>(c.content);
 
@@ -109,7 +149,7 @@ int Enviroment::num_eval(cell const &c) {
 				return std::stoi(s);
 
 			//Check if variable
-			cell *var = get(s);
+			var = get(s);
 			if(var != NULL)
 				return num_eval(*var);
 
@@ -131,10 +171,18 @@ int Enviroment::num_eval_cont(cell const &c) {
 
 //Convert to char
 char Enviroment::char_eval(cell const &c) {
+	cell *var;
 	switch(c.type) {
 		case EXPR:
 			return char_eval(eval(c));
-		case NUMBER: case CHAR:
+		case NUMBER:
+			return std::get<int>(c.content);
+		case CHAR:
+			//Check if variable
+			var = get(string(1, std::get<int>(c.content)));
+			if(var != NULL)
+				return char_eval(*var);
+
 			return std::get<int>(c.content);
 		case STRING:
 			//Check if short enough
@@ -143,7 +191,7 @@ char Enviroment::char_eval(cell const &c) {
 				return s[0];
 
 			//Check if variable
-			cell *var = get(s);
+			var = get(s);
 			if(var != NULL)
 				return char_eval(*var);
 
@@ -159,16 +207,23 @@ char Enviroment::char_eval_cont(cell const &c) {
 
 //Convert to list
 sexpr Enviroment::list_eval(cell const &c) {
+	cell *var;
 	switch(c.type) {
 		case EXPR:
 			return list_eval(eval(c));
 		case LIST:
 			return std::get<sexpr>(c.content);
+		case CHAR:
+			//Check if variable
+			var = get(string(1, std::get<int>(c.content)));
+			if(var != NULL)
+				return list_eval(*var);
+			break;
 		case STRING:
 			string s = std::get<string>(c.content);
 
 			//Check if variable
-			cell *var = get(s);
+			var = get(s);
 			if(var != NULL)
 				return list_eval(*var);
 
@@ -207,6 +262,10 @@ builtin Enviroment::function_eval(cell const &c) {
 			var = get(string(1, std::get<int>(c.content)));
 			if(var != NULL)
 				return function_eval(*var);
+		case LIST:
+			builtin func = build_function(std::get<sexpr>(c.content));
+			set("recursive", cell(func, FUNCTION));
+			return func;
 	}
 	CONVERTERROR("function");
 }

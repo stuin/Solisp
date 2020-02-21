@@ -66,6 +66,7 @@ private:
 
 	//Library structure
 	void build_library();
+	builtin build_function(sexpr func);
 
 	//Reader functions
 	std::list<std::string> tokenize(const std::string & str);
