@@ -15,11 +15,7 @@
 Passed Fail)
 
 #Mapping loops and product of a list
-(If (Eval * (Map list i (!= i 0)))
-Passed Fail)
-
-#Filtering list
-(If (== (Eval + (Filter list i (== (% i 2) 1))) 9)
+(If (Eval * (Map i list (!= i 0)))
 Passed Fail)
 
 #General list modifying

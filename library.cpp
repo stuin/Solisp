@@ -68,6 +68,8 @@ void Enviroment::build_library() {
 		string delim = "";
 		if(pos != end)
 			delim += env->str_eval(*pos++);
+		if(delim == "\\n")
+			delim = "\n";
 
 		//Perform actual appending
 		for(cell s : array)
@@ -199,8 +201,8 @@ void Enviroment::build_library() {
 
 	//High level functions
 	set("Map", cell([](Enviroment *env, marker pos, marker end) {
-		sexpr array = env->list_eval(*pos++);
 		string var = env->str_eval(*pos++, true);
+		sexpr array = env->list_eval(*pos++);
 		sexpr output;
 		env->shift_env(true);
 
@@ -208,24 +210,6 @@ void Enviroment::build_library() {
 		for(cell c : array) {
 			env->set(var, c);
 			output.push_back(env->eval(*pos));
-		}
-
-		env->shift_env(false);
-		++pos;
-		DONE;
-		return cell(output, LIST);
-	}));
-	set("Filter", cell([](Enviroment *env, marker pos, marker end) {
-		sexpr array = env->list_eval(*pos++);
-		string var = env->str_eval(*pos++, true);
-		sexpr output;
-		env->shift_env(true);
-
-		//Re list each value
-		for(cell c : array) {
-			env->set(var, c);
-			if(env->num_eval(*pos))
-				output.push_back(c);
 		}
 
 		env->shift_env(false);
