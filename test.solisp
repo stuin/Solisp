@@ -10,12 +10,16 @@
 	(% 15 10)
 ) Passed Fail)
 
-#Summing up lists
-(If (< (Eval {+ (Set list {1 2 3 4 5})}) 20) #{+ 1 2 3 4 5}
+#Building and summing up lists
+(If (< (Eval {+ (Set list (Seq 1 5))}) 20) #{+ 1 2 3 4 5}
 Passed Fail)
 
 #Mapping loops and product of a list
 (If (Eval * (Map list i (!= i 0)))
+Passed Fail)
+
+#Filtering list
+(If (== (Eval + (Filter list i (== (% i 2) 1))) 9)
 Passed Fail)
 
 #General list modifying
@@ -23,6 +27,15 @@ Passed Fail)
 
 #Step
 (Step (Set start Pass) (Join {start ed}))
+
+#Switch statement
+(Switch
+	{(== 5 3) Fail1}
+	{(> 6 10) Fail2}
+	{(!= 3 1) Passed}
+	{(< 3 0) Fail3}
+	{True Fail4}
+)
 
 #Test nested enviroments
 (If (!=
@@ -35,7 +48,7 @@ Passed Fail)
 Passed Fail)
 
 #Basic user-defined function
-(If (== ((Set add {{x y} (+ x y)}) 2 3) 5)
+(If (== ({{x y} (+ x y)} 2 3) 5)
 Passed Fail)
 
 #Succesfull recursive function

@@ -55,7 +55,9 @@ void Enviroment::build_library() {
 
 	//Numerical comparisons
 	set(">", comparitor(std::greater<int>()));
+	set(">=", comparitor(std::greater_equal<int>()));
 	set("<", comparitor(std::less<int>()));
+	set("<=", comparitor(std::less_equal<int>()));
 
 	//Advanced list to string conversion
 	set("Join", cell([](Enviroment *env, marker pos, marker end) {
@@ -76,12 +78,6 @@ void Enviroment::build_library() {
 	}));
 
 	//List building functions
-	set("Quote", cell([](Enviroment *env, marker pos, marker end) {
-		sexpr output;
-		while(pos != end)
-			output.push_back(env->eval(*pos++));
-		return cell(output, LIST);
-	}));
 	set("Append", cell([](Enviroment *env, marker pos, marker end) {
 		LISTREMAINS;
 		sexpr output;
@@ -90,6 +86,18 @@ void Enviroment::build_library() {
 			sexpr array = env->list_eval(*pos++);
 			output.insert(output.end(), array.begin(), array.end());
 		}
+		return cell(output, LIST);
+	}));
+	set("Seq", cell([](Enviroment *env, marker pos, marker end) {
+		int first = env->num_eval(*pos++);
+		int last = env->num_eval(*pos++);
+		sexpr output;
+
+		//Add numbers to list
+		for(int i = first; i <= last; i++)
+			output.push_back(cell(i));
+
+		DONE;
 		return cell(output, LIST);
 	}));
 	set("Remove", cell([](Enviroment *env, marker pos, marker end) {
@@ -103,6 +111,18 @@ void Enviroment::build_library() {
 				output.push_back(*pos);
 			pos++;
 		}
+
+		return cell(output, LIST);
+	}));
+	set("Tail", cell([](Enviroment *env, marker pos, marker end) {
+		LISTREMAINS;
+		sexpr output;
+		++pos;
+
+		//Copy all other cells
+		while(pos != end)
+				output.push_back(*pos++);
+
 		return cell(output, LIST);
 	}));
 	set("Clone", cell([](Enviroment *env, marker pos, marker end) {
@@ -110,6 +130,7 @@ void Enviroment::build_library() {
 		LISTREMAINS;
 		sexpr output;
 
+		//Copy list multiple times
 		for(int i = 0; i < count; i++)
 			output.insert(output.end(), pos, end);
 
@@ -132,16 +153,51 @@ void Enviroment::build_library() {
 			//If true
 			output = *pos++;
 			if(pos != end)
-				pos++;
+				++pos;
 		} else {
 			//If false
-			pos++;
+			++pos;
 			if(pos != end)
 				output = *pos++;
 		}
 		DONE;
 		return output;
 	}));
+	set("Step", cell([](Enviroment *env, marker pos, marker end) {
+		LISTREMAINS;
+		cell output;
+
+		while(pos != end)
+			output = env->eval(*pos++);
+
+		return output;
+	}));
+	set("Switch", cell([](Enviroment *env, marker pos, marker end) {
+		LISTREMAINS;
+		sexpr array;
+
+		while(pos != end) {
+			array = env->list_eval(*pos++);
+			if(env->num_eval(array[0]))
+				return array[1];
+		}
+
+		return cell(0);
+	}));
+	set("Get", cell([](Enviroment *env, marker pos, marker end) {
+		int index = env->num_eval(*pos++);
+		LISTREMAINS;
+
+		//Copy all other cells
+		while(index != 0 && pos != end) {
+			++pos;
+			--index;
+		}
+
+		return *pos;
+	}));
+
+	//High level functions
 	set("Map", cell([](Enviroment *env, marker pos, marker end) {
 		sexpr array = env->list_eval(*pos++);
 		string var = env->str_eval(*pos++, true);
@@ -155,29 +211,28 @@ void Enviroment::build_library() {
 		}
 
 		env->shift_env(false);
-		pos++;
+		++pos;
 		DONE;
 		return cell(output, LIST);
 	}));
+	set("Filter", cell([](Enviroment *env, marker pos, marker end) {
+		sexpr array = env->list_eval(*pos++);
+		string var = env->str_eval(*pos++, true);
+		sexpr output;
+		env->shift_env(true);
 
-	//Iterative stuff
-	set("Step", cell([](Enviroment *env, marker pos, marker end) {
-		LISTREMAINS;
-		cell output;
+		//Re list each value
+		for(cell c : array) {
+			env->set(var, c);
+			if(env->num_eval(*pos))
+				output.push_back(c);
+		}
 
-		while(pos != end)
-			output = env->eval(*pos++);
-
-		return output;
-	}));
-	set("Println", cell([](Enviroment *env, marker pos, marker end) {
-		string s = env->str_eval(*pos++);
+		env->shift_env(false);
+		++pos;
 		DONE;
-		std::cout << s << "\n";
-		return cell(s);
+		return cell(output, LIST);
 	}));
-
-	//Convert list to runnable code
 	set("Eval", cell([](Enviroment *env, marker pos, marker end) {
 		LISTREMAINS;
 		sexpr output;
@@ -192,6 +247,17 @@ void Enviroment::build_library() {
 	//Variable management
 	set("Set", cell([](Enviroment *env, marker pos, marker end) {
 		string name = env->str_eval(*pos++);
+
+		//Check for existing value
+		if(env->get(name) != NULL)
+			throw std::domain_error("Already defined variable: " + name + " (use Enforce)");
+
+		cell output = env->set(name, *pos++);
+		DONE;
+		return output;
+	}));
+	set("Enforce", cell([](Enviroment *env, marker pos, marker end) {
+		string name = env->str_eval(*pos++);
 		cell output = env->set(name, *pos++);
 		DONE;
 		return output;
@@ -204,7 +270,6 @@ void Enviroment::build_library() {
 		DONE;
 		return output;
 	}));
-
 
 	//Universal comparisons
 	set("==", cell([](Enviroment *env, marker pos, marker end) {
