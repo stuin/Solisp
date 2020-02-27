@@ -59,6 +59,22 @@ void Enviroment::build_library() {
 	set("<", comparitor(std::less<int>()));
 	set("<=", comparitor(std::less_equal<int>()));
 
+	//Universal comparisons
+	set("==", cell([](Enviroment *env, marker pos, marker end) {
+		cell c = env->eval(*pos++);
+		while(pos != end)
+			if(!(env->equals(c, *pos++)))
+				return 0;
+		return 1;
+	}));
+	set("!=", cell([](Enviroment *env, marker pos, marker end) {
+		cell c = env->eval(*pos++);
+		while(pos != end)
+			if(env->equals(c, *pos++))
+				return 0;
+		return 1;
+	}));
+
 	//Advanced list to string conversion
 	set("Join", cell([](Enviroment *env, marker pos, marker end) {
 		sexpr array = env->list_eval(*pos++);
@@ -217,16 +233,6 @@ void Enviroment::build_library() {
 		DONE;
 		return cell(output, LIST);
 	}));
-	set("Eval", cell([](Enviroment *env, marker pos, marker end) {
-		LISTREMAINS;
-		sexpr output;
-
-		while(pos != end) {
-			sexpr array = env->list_eval(*pos++);
-			output.insert(output.end(), array.begin(), array.end());
-		}
-		return cell(output, EXPR);
-	}));
 
 	//Variable management
 	set("Set", cell([](Enviroment *env, marker pos, marker end) {
@@ -234,40 +240,16 @@ void Enviroment::build_library() {
 
 		//Check for existing value
 		if(env->get(name) != NULL)
-			throw std::domain_error("Already defined variable: " + name + " (use Enforce)");
+			throw std::domain_error("Already defined variable: " + name + " (use Mutate)");
 
 		cell output = env->set(name, *pos++);
 		DONE;
 		return output;
 	}));
-	set("Enforce", cell([](Enviroment *env, marker pos, marker end) {
+	set("Mutate", cell([](Enviroment *env, marker pos, marker end) {
 		string name = env->str_eval(*pos++);
 		cell output = env->set(name, *pos++);
 		DONE;
 		return output;
-	}));
-	set("Env", cell([](Enviroment *env, marker pos, marker end) {
-		env->shift_env(true);
-		cell output = env->eval(*pos++);
-
-		env->shift_env(false);
-		DONE;
-		return output;
-	}));
-
-	//Universal comparisons
-	set("==", cell([](Enviroment *env, marker pos, marker end) {
-		cell c = env->eval(*pos++);
-		while(pos != end)
-			if(!(env->equals(c, *pos++)))
-				return 0;
-		return 1;
-	}));
-	set("!=", cell([](Enviroment *env, marker pos, marker end) {
-		cell c = env->eval(*pos++);
-		while(pos != end)
-			if(env->equals(c, *pos++))
-				return 0;
-		return 1;
 	}));
 }

@@ -11,11 +11,11 @@
 ) Passed Fail)
 
 #Building and summing up lists
-(If (< (Eval {+ (Set list (Seq 1 5))}) 20) #{+ 1 2 3 4 5}
+(If (< (+ (Set list (Seq 1 5))) 20) #{+ 1 2 3 4 5}
 Passed Fail)
 
 #Mapping loops and product of a list
-(If (Eval * (Map i list (!= i 0)))
+(If (* (Map i list (!= i 0)))
 Passed Fail)
 
 #General list modifying
@@ -32,16 +32,6 @@ Passed Fail)
 	{(< 3 0) Fail3}
 	{True Fail4}
 )
-
-#Test nested enviroments
-(If (!=
-		yes
-		(Env (Step {
-			(Set yes no)
-			yes
-		}))
-	)
-Passed Fail)
 
 #Basic user-defined function
 (If (== ({{x y} (+ x y)} 2 3) 5)
