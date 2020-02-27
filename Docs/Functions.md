@@ -8,7 +8,7 @@ Name 	|Return |Arguments 			|Description									|
 ----	|----	|----				|----											|
 \+		|Num	|\[Num\] 			|Addition										|
 \-		|Num	|\[Num\] 			|Subtraction									|
-*		|Num	|\[Num\] 			|Multiplication									|
+\*		|Num	|\[Num\] 			|Multiplication									|
 /		|Num	|\[Num\] 			|Division										|
 %		|Num	|\[Num\] 			|Modulus										|
 \>		|Bool 	|\[Num\] 			|Greater than									|
