@@ -1,3 +1,5 @@
+[Basic Structure](https://github.com/stuin/Solisp/blob/master/Docs/Basics.md)
+
 # Functions
 Full list of builtin functions, ordered in the same vauge way as in the code.
 All are case sensitive, a Bool is just a number.
