@@ -17,7 +17,7 @@ General mathmatical operations can be done as expected, and will be evaluated le
 ```
 All of the above examples should return 3.
 
-## Lists and strings
+## Other syntax
 Lists can be created using a few different functions, but curly braces can also be used to make it easier.
 
 ```
@@ -37,14 +37,30 @@ lots of words
 "lots of words"
 ```
 These are not.
+Finally,
+```
+#This is a comment.
+```
+
+## Argument folding
+In any case where the very last argument that a function asks for is a list, the function can accept that list in two different ways. Either a normal list can be provided, or all objects in the list can be provided directly as arguments.
+You may have noticed that a normal mathmatical operator can accept more than just two arguments. In fact, all the basic mathmatical operators effectivly have the builtin functionality of foldl.
+```
+(+ 1 2 3 4 5)
+(+ {1 2 3 4 5})
+(+ (+ {1 2 3}) (+ 4 5))
+(+ (+ 1 2) (+ 3 (+ 4 5)))
+```
+All these are equivalent.
+It is important to note that any time there is only one argument in these cases, it is assumed to be a list. It may be required to put a string inside curly braces if it is the only value.
 
 ## Type conversion
-All objects are stored as c++ structures with specific types, but converting between types is done automatically and dynamically. (No booleans, just numbers).
+All objects are stored as c++ structures with specific types, but converting between types is done automatically and dynamically. Each row shows what a type can be converted to.
 
 Type 	|Stored	|Expr	|List 	|Number |Char 	|String	|Function 	|
 ----	|----	|----	|----	|----	|----	|----	|----		|
 Expr 	|Vector	|Yes	|Yes	|No 	|No 	|Append |No 		|
-List 	|Vector	|Yes	|Yes	|Size	|No 	|Append |Yes		|
+List 	|Vector	|Yes	|Yes	|No 	|No 	|Append |Yes		|
 Number	|Int	|No 	|Single	|Yes 	|Value	|Yes	|No 		|
 Char	|Int	|No 	|Single |Value	|Yes	|Yes	|No 		|
 String 	|String |No 	|Chars	|Yes?	|Yes?	|Yes	|No 		|
@@ -58,18 +74,6 @@ To set a variable, the Set function can be used, followed by a name and a value.
 (Set x 3)
 ```
  This will return and give x the value 3 in the current scope. Using the set command, all variables are immutable, and cannot be changed. However, variables can be reassigned by replacing Set with Mutate.
-
-## Argument folding
-In any case where the very last argument that a function asks for is a list, the function can accept that list in two different ways. Either a normal list can be provided, or all objects in the list can be provided directly as arguments.
-You may have noticed that a normal mathmatical operator can accept more than just two arguments. In fact, all the basic mathmatical operators effectivly have the builtin functionality of foldl.
-```
-(+ 1 2 3 4 5)
-(+ {1 2 3 4 5})
-(+ (+ {1 2 3}) (+ 4 5))
-(+ (+ 1 2) (+ 3 (+ 4 5)))
-```
-All these are equivalent.
-It is important to note that any time there is only one argument in these cases, it is assumed to be a list. It may be required to put a string inside curly braces if it is the only value.
 
 ## Functions
 Writing functions is quite straightforward, though the syntax is not the greatest in the world. If a existing function name is not provided, the system can attempt to convert a list into a function.
@@ -93,4 +97,4 @@ Also note that an entire function can be placed into a variable, and that the va
 ```
 
 # Next
-- [List of functions](https://github.com/stuin/Solisp/blob/master/Docs/Functions.md)
+- [List of functions](https://github.com/stuin/Solisp/blob/master/docs/Functions.md)

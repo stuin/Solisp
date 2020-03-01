@@ -2,10 +2,15 @@
 An interpreted lisp-based language built in C++
 
 ### Docs
-- [Basic Structure](https://github.com/stuin/Solisp/blob/master/Docs/Basics.md)
-- [List of Functions](https://github.com/stuin/Solisp/blob/master/Docs/Functions.md)
-- [Example](https://github.com/stuin/Solisp/blob/master/test.solisp)
+- [Basic Structure](https://github.com/stuin/Solisp/blob/master/docs/Basics.md)
+- [List of Functions](https://github.com/stuin/Solisp/blob/master/docs/Functions.md)
+- [Test Example](https://github.com/stuin/Solisp/blob/master/src/test.solisp)
+- [Sample Programs](https://github.com/TheRenegadeCoder/sample-programs/tree/master/archive/s/solisp)
 
-### Building
+### Linux
 - [EZBuild](https://github.com/stuin/ezbuild)
-- WIP
+- Make
+```
+make
+sudo make install
+```

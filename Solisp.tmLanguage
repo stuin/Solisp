@@ -62,7 +62,7 @@
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>\b(Set|Mutate|Map)\b\s+((\w)*)\b</string>
+			<string>\b(Set|Mutate|MapI?)\b\s+((\w)*)\b</string>
 			<key>name</key>
 			<string>support.function.solisp</string>
 		</dict>

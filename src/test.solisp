@@ -15,7 +15,11 @@
 Passed Fail)
 
 #Mapping loops and product of a list
-(If (* (Map i list (!= i 0)))
+(If (* (Map x list (!= x 0)))
+Passed Fail)
+
+#Alternate map function
+(If (* (MapI x i list (> x i)))
 Passed Fail)
 
 #General list modifying

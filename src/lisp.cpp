@@ -133,8 +133,6 @@ int Enviroment::num_eval(cell const &c) {
 			return num_eval(eval(c));
 		case NUMBER:
 			return std::get<int>(c.content);
-		case LIST:
-			return std::get<sexpr>(c.content).size();
 		case CHAR:
 			//Check if variable
 			var = get(string(1, std::get<int>(c.content)));

@@ -233,6 +233,26 @@ void Enviroment::build_library() {
 		DONE;
 		return cell(output, LIST);
 	}));
+	set("MapI", cell([](Enviroment *env, marker pos, marker end) {
+		string var = env->str_eval(*pos++, true);
+		string index = env->str_eval(*pos++, true);
+		sexpr array = env->list_eval(*pos++);
+		sexpr output;
+		env->shift_env(true);
+		int i = 0;
+
+		//Re list each value
+		for(cell c : array) {
+			env->set(var, c);
+			env->set(index, i++);
+			output.push_back(env->eval(*pos));
+		}
+
+		env->shift_env(false);
+		++pos;
+		DONE;
+		return cell(output, LIST);
+	}));
 
 	//Variable management
 	set("Set", cell([](Enviroment *env, marker pos, marker end) {

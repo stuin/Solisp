@@ -1,5 +1,3 @@
-[Basic Structure](https://github.com/stuin/Solisp/blob/master/Docs/Basics.md)
-
 # Functions
 Full list of builtin functions, ordered in the same vauge way as in the code.
 All are case sensitive, a Bool is just a number.
@@ -17,7 +15,7 @@ Name 	|Return |Arguments 			|Description									|
 <=		|Bool 	|\[Num\] 			|Less than or equal 							|
 ==		|Bool	|\[Any\]			|Is equal 										|
 \!=		|Bool	|\[Any\]			|Is not equal 									|
-Join	|String	|\[String\],<String>|Append strings together 						|
+Join	|String	|\[String\],<String>|Concat strings together with delimeter			|
 Append	|\[Any\]|\[\[Any\]\]		|Append lists together 							|
 Seq		|\[Num\]|Num,Num 			|List numbers from first to second 				|
 Remove	|\[Any\]|Any,\[Any\]		|Remove all that equal first from list 			|
@@ -29,5 +27,9 @@ Step	|Any 	|\[Any\]			|Evaluate all elements, return last one 		|
 Switch	|Any 	|\[\[Bool,Any\]\]	|Return end of the first list to start with true|
 Get 	|Any 	|Num,\[Any\]		|Return nth element in list 					|
 Map 	|\[Any\]|String,\[Any\],Any |For each element in list, evaluate third 		|
+MapI 	|\[Any\]|String,String,\[Any\],Any |Map but with a second index variable 	|
 Set 	|Any 	|String,Any 		|Set value of string to third, return third		|
 Mutate 	|Any 	|String,Any 		|Set but not pure/safe							|
+
+
+[Basic Structure](https://github.com/stuin/Solisp/blob/master/docs/Basics.md)
