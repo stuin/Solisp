@@ -4,7 +4,6 @@
 int main(int argc, char const *argv[])
 {
 	Enviroment env;
-	std::cout << "Solisp initialized\n";
 
 	if(argc > 1) {
 		std::ifstream infile(argv[1]);

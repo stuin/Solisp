@@ -1,7 +1,7 @@
 include config.mk
 
 SRC = src/library.cpp src/lisp.cpp src/main.cpp src/reader.cpp
-OBJ = $(SRC:src/%.cpp=%.o)
+OBJ = $(SRC:%.cpp=%.o)
 
 all: options solisp
 
@@ -13,12 +13,11 @@ options:
 
 .cpp.o:
 	@echo CC $<
-	@${CC} -c ${CFLAGS} $<
+	@${CC} -c ${CFLAGS} -o $@ $<
 
 ${OBJ}: config.mk
 
 solisp: ${OBJ}
-	@cd src
 	@echo LD $@
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
 
