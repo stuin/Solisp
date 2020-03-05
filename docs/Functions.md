@@ -26,6 +26,7 @@ If 		|Any 	|Bool,Any,<Any>		|If true, second, else third/0 					|
 Step	|Any 	|\[Any\]			|Evaluate all elements, return last one 		|
 Switch	|Any 	|\[\[Bool,Any\]\]	|Return end of the first list to start with true|
 Get 	|Any 	|Num,\[Any\]		|Return nth element in list 					|
+Length 	|Num 	|\[Any\]			|Calculate length of list 						|
 Map 	|\[Any\]|String,\[Any\],Any |For each element in list, evaluate third 		|
 MapI 	|\[Any\]|String,String,\[Any\],Any |Map but with a second index variable 	|
 Set 	|Any 	|String,Any 		|Set value of string to third, return third		|

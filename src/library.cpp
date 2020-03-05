@@ -202,6 +202,8 @@ void Enviroment::build_library() {
 
 		return cell(0);
 	}));
+
+	//List evaluation
 	set("Get", cell([](Enviroment *env, marker pos, marker end) {
 		int index = env->num_eval(*pos++);
 		LISTREMAINS;
@@ -213,6 +215,18 @@ void Enviroment::build_library() {
 		}
 
 		return *pos;
+	}));
+	set("Length", cell([](Enviroment *env, marker pos, marker end) {
+		int size = 0;
+		LISTREMAINS;
+
+		//Copy all other cells
+		while(pos != end) {
+			++pos;
+			++size;
+		}
+
+		return cell(size);
 	}));
 
 	//High level functions
