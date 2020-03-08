@@ -10,9 +10,14 @@ template <class T> cell Enviroment::comparitor(T func) {
 	return cell([func](Enviroment *env, marker pos, marker end) {
 		LISTREMAINS;
 		int source = env->num_eval(*pos++);
-		while(pos != end)
-			if(!func(source, env->num_eval(*pos++)))
+		int next = 0;
+
+		while(pos != end) {
+			next = env->num_eval(*pos++);
+			if(!func(source, next))
 				return 0;
+			source = next;
+		}
 		return 1;
 	});
 }
@@ -61,14 +66,18 @@ void Enviroment::build_library() {
 
 	//Universal comparisons
 	set("==", cell([](Enviroment *env, marker pos, marker end) {
+		LISTREMAINS;
 		cell c = env->eval(*pos++);
+
 		while(pos != end)
 			if(!(env->equals(c, *pos++)))
 				return 0;
 		return 1;
 	}));
 	set("!=", cell([](Enviroment *env, marker pos, marker end) {
+		LISTREMAINS;
 		cell c = env->eval(*pos++);
+
 		while(pos != end)
 			if(env->equals(c, *pos++))
 				return 0;

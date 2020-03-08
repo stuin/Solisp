@@ -38,7 +38,9 @@ Passed Fail)
 )
 
 #Basic user-defined function
-(If (== ({{x y} (+ x y)} 2 3) 5)
+(If (== (
+	{{x y} (+ x y)}
+2 3) 5)
 Passed Fail)
 
 #Succesfull recursive function
