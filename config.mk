@@ -1,5 +1,5 @@
 # solisp version
-VERSION = 1.1
+VERSION = 2.0
 
 # install paths
 PREFIX = /usr/local
