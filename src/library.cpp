@@ -51,6 +51,12 @@ void Enviroment::build_library() {
 		return cell(env->list_eval(c), LIST);
 	};
 
+	//Add constants
+	set("true", cell(1));
+	set("false", cell(0));
+	set("newline", cell("\n"));
+	set("\\n", cell("\n"));
+
 	//Basic arithmatic
 	set("+", arithmetic(std::plus<int>()));
 	set("-", arithmetic(std::minus<int>()));
@@ -93,8 +99,6 @@ void Enviroment::build_library() {
 		string delim = "";
 		if(pos != end)
 			delim += env->str_eval(*pos++);
-		if(delim == "\\n")
-			delim = "\n";
 
 		//Perform actual appending
 		for(cell s : array)
@@ -240,7 +244,7 @@ void Enviroment::build_library() {
 
 	//High level functions
 	set("Map", cell([](Enviroment *env, marker pos, marker end) {
-		string var = env->str_eval(*pos++, true);
+		string var = env->str_print(*pos++);
 		sexpr array = env->list_eval(*pos++);
 		sexpr output;
 		env->shift_env(true);
@@ -257,7 +261,7 @@ void Enviroment::build_library() {
 		return cell(output, LIST);
 	}));
 	set("MapI", cell([](Enviroment *env, marker pos, marker end) {
-		string var = env->str_eval(*pos++, true);
+		string var = env->str_print(*pos++);
 		string index = env->str_eval(*pos++, true);
 		sexpr array = env->list_eval(*pos++);
 		sexpr output;
@@ -279,7 +283,7 @@ void Enviroment::build_library() {
 
 	//Variable management
 	set("Set", cell([](Enviroment *env, marker pos, marker end) {
-		string name = env->str_eval(*pos++);
+		string name = env->str_print(*pos++);
 
 		//Check for existing value
 		if(env->get(name) != NULL)
@@ -290,7 +294,7 @@ void Enviroment::build_library() {
 		return output;
 	}));
 	set("Mutate", cell([](Enviroment *env, marker pos, marker end) {
-		string name = env->str_eval(*pos++);
+		string name = env->str_print(*pos++);
 		cell output = env->set(name, *pos++);
 		DONE;
 		return output;

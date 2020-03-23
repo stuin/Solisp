@@ -22,6 +22,7 @@ Lists can be created using a few different functions, but curly braces can also 
 
 ```
 {1 2 3 4 5}
+#This is a comment.
 ```
 
 This will not be evaluated as a function, just stored as a list.
@@ -36,10 +37,12 @@ These are equivalent.
 lots of words
 "lots of words"
 ```
-These are not.
-Finally,
+These are not, as the first one will only include the first word.
+Finally, if a string is the same as an existing function or variable, a colon can be used to denote the literal string.
 ```
-#This is a comment.
+:Set -> Set
+Set -> <func>
+:: -> :
 ```
 
 ## Argument folding
@@ -64,7 +67,7 @@ List 	|Vector	|Yes	|Yes	|No 	|No 	|Append |Yes		|
 Number	|Int	|No 	|Single	|Yes 	|Value	|Yes	|No 		|
 Char	|Int	|No 	|Single |Value	|Yes	|Yes	|No 		|
 String 	|String |No 	|Chars	|Yes?	|Yes?	|Yes	|No 		|
-Function|Lambda |No 	|No 	|No 	|No 	|No 	|Yes		|
+Function|Lambda |No 	|No 	|No 	|No 	|<:func>|Yes		|
 
 ## Variables
 Anything can be stored in a variable, including all of the above types. Variables are dynamically typed, dynamically scoped, and case sensitive.
@@ -73,7 +76,15 @@ To set a variable, the Set function can be used, followed by a name and a value.
 ```
 (Set x 3)
 ```
- This will return and give x the value 3 in the current scope. Using the set command, all variables are immutable, and cannot be changed. However, variables can be reassigned by replacing Set with Mutate.
+This will return and give x the value 3 in the current scope. Using the set command, all variables are immutable, and cannot be changed. However, variables can be reassigned by replacing Set with Mutate.
+
+## Constants
+There are a few useful system constants
+```
+true -> 1
+false -> 0
+newline -> \n
+```
 
 ## Functions
 Writing functions is quite straightforward, though the syntax is not the greatest in the world. If a existing function name is not provided, the system can attempt to convert a list into a function.

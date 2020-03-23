@@ -19,9 +19,10 @@ builtin Enviroment::build_function(sexpr func) {
 				DONE;
 			}
 
-			//Prevent infinite loops
-			if(env->str_eval(c, true) != env->str_eval(*pos, true))
-				env->set(env->str_eval(c, true), *pos++);
+			//Prevent infinite loops when setting variables
+			string s = env->str_print(c);
+			if(s != env->str_print(*pos))
+				env->set(s, *pos++);
 		}
 
 		cell output = env->eval(func[1]);
@@ -92,7 +93,7 @@ string Enviroment::str_eval(cell const &c, bool literal) {
 		case NUMBER:
 			return std::to_string(std::get<int>(c.content));
 		case FUNCTION:
-			return "f";
+			return "<:func>";
 		case LIST: case EXPR:
 			array = std::get<sexpr>(c.content);
 			for(cell s : array)
@@ -125,6 +126,25 @@ string Enviroment::str_eval_cont(cell const &c, bool literal) {
 	CONVERTERROR("string");
 }
 
+//Remove literal markers
+string Enviroment::str_print(cell const &c) {
+	string s = str_eval(c);
+	string out = "";
+
+	for(int i = 0; i < (int)s.length(); i++) {
+		if(s[i] == ':') {
+			if(i + 1 < (int)s.length() && s[i + 1] == ':') {
+				i++;
+				out += ':';
+			}
+		} else {
+			out += s[i];
+		}
+	}
+
+	return out;
+}
+
 //Convert to number
 int Enviroment::num_eval(cell const &c) {
 	cell *var;
@@ -151,12 +171,6 @@ int Enviroment::num_eval(cell const &c) {
 			var = get(s);
 			if(var != NULL)
 				return num_eval(*var);
-
-			//Try boolean values
-			if(s[0] == 't' || s[0] == 'T')
-				return 1;
-			if(s[0] == 'f' || s[0] == 'F')
-				return 0;
 
 			throw std::domain_error("No variable or value found for " + s);
 	}

@@ -91,6 +91,7 @@ public:
 
 	//Convert types
 	string str_eval(cell const &c, bool literal=false);
+	string str_print(cell const &c);
 	int num_eval(cell const &c);
 	char char_eval(cell const &c);
 	sexpr list_eval(cell const &c);
