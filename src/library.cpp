@@ -101,7 +101,7 @@ void Enviroment::build_library() {
 
 	//Type comparison
 	set("Type", cell([](Enviroment *env, marker pos, marker end) {
-		return type_name[(int)env->eval(*pos).type];
+		return env->type_name[(int)env->eval(*pos).type];
 	}));
 
 	//Advanced list to string conversion
