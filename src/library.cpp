@@ -15,10 +15,10 @@ template <class T> cell Enviroment::comparitor(T func) {
 		while(pos != end) {
 			next = env->num_eval(*pos++);
 			if(!func(source, next))
-				return 0;
+				return cell((char)0, BOOL);
 			source = next;
 		}
-		return 1;
+		return cell((char)1, BOOL);
 	});
 }
 
@@ -35,25 +35,34 @@ template <class T> cell Enviroment::arithmetic(T func) {
 
 void Enviroment::build_library() {
 	//Build force evaluators
+	type_name[EXPR] = "Expression";
 	force_eval[EXPR] = [](Enviroment *env, cell const &c) {
 		return c;
 	};
+	type_name[STRING] = "String";
 	force_eval[STRING] = [](Enviroment *env, cell const &c) {
 		return cell(env->str_eval(c, false), STRING);
 	};
+	type_name[BOOL] = "Boolean";
+	force_eval[BOOL] = [](Enviroment *env, cell const &c) {
+		return cell(env->bool_eval(c), BOOL);
+	};
+	type_name[NUMBER] = "Number";
 	force_eval[NUMBER] = [](Enviroment *env, cell const &c) {
 		return cell(env->num_eval(c), NUMBER);
 	};
+	type_name[CHAR] = "Char";
 	force_eval[CHAR] = [](Enviroment *env, cell const &c) {
 		return cell(env->char_eval(c), CHAR);
 	};
+	type_name[LIST] = "List";
 	force_eval[LIST] = [](Enviroment *env, cell const &c) {
 		return cell(env->list_eval(c), LIST);
 	};
 
 	//Add constants
-	set("true", cell(1));
-	set("false", cell(0));
+	set("true", cell((char)1, BOOL));
+	set("false", cell((char)0, BOOL));
 	set("newline", cell("\n"));
 	set("\\n", cell("\n"));
 
@@ -77,8 +86,8 @@ void Enviroment::build_library() {
 
 		while(pos != end)
 			if(!(env->equals(c, *pos++)))
-				return 0;
-		return 1;
+				return cell((char)0, BOOL);
+		return cell((char)1, BOOL);
 	}));
 	set("!=", cell([](Enviroment *env, marker pos, marker end) {
 		LISTREMAINS;
@@ -86,8 +95,13 @@ void Enviroment::build_library() {
 
 		while(pos != end)
 			if(env->equals(c, *pos++))
-				return 0;
-		return 1;
+				return cell((char)0, BOOL);
+		return cell((char)1, BOOL);
+	}));
+
+	//Type comparison
+	set("Type", cell([](Enviroment *env, marker pos, marker end) {
+		return type_name[(int)env->eval(*pos).type];
 	}));
 
 	//Advanced list to string conversion
@@ -180,7 +194,7 @@ void Enviroment::build_library() {
 	//Control flow
 	set("If", cell([](Enviroment *env, marker pos, marker end) {
 		cell output = cell(0);
-		if(env->num_eval(*pos++)) {
+		if(env->bool_eval(*pos++)) {
 			//If true
 			output = *pos++;
 			if(pos != end)
@@ -209,7 +223,7 @@ void Enviroment::build_library() {
 
 		while(pos != end) {
 			array = env->list_eval(*pos++);
-			if(env->num_eval(array[0]))
+			if(env->bool_eval(array[0]))
 				return array[1];
 		}
 

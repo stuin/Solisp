@@ -60,14 +60,15 @@ It is important to note that any time there is only one argument in these cases,
 ## Type conversion
 All objects are stored as c++ structures with specific types, but converting between types is done automatically and dynamically. Each row shows what a type can be converted to.
 
-Type 	|Stored	|Expr	|List 	|Number |Char 	|String	|Function 	|
-----	|----	|----	|----	|----	|----	|----	|----		|
-Expr 	|Vector	|Yes	|Yes	|No 	|No 	|Append |No 		|
-List 	|Vector	|Yes	|Yes	|No 	|No 	|Append |Yes		|
-Number	|Int	|No 	|Single	|Yes 	|Value	|Yes	|No 		|
-Char	|Int	|No 	|Single |Value	|Yes	|Yes	|No 		|
-String 	|String |No 	|Chars	|Yes?	|Yes?	|Yes	|No 		|
-Function|Lambda |No 	|No 	|No 	|No 	|<:func>|Yes		|
+Type 	|Stored	|Expr	|List 	|Bool	|Number |Char 	|String	|Function 	|
+----	|----	|----	|----	|----	|----	|----	|----	|----		|
+Expr 	|vector	|Yes	|Yes	|No 	|No 	|No 	|Append |No 		|
+List 	|vector	|Yes	|Yes	|No 	|No 	|No 	|Append |Yes		|
+Bool	|char	|No 	|Single	|Yes 	|Yes 	|Value	|Yes	|No 		|
+Number	|int	|No 	|Single	|Yes 	|Yes 	|Value	|Yes	|No 		|
+Char	|char	|No 	|Single |Value	|Value	|Yes	|Yes	|No 		|
+String 	|string |No 	|Chars	|Yes?	|Yes?	|Yes?	|Yes	|No 		|
+Function|function|No 	|No 	|No 	|No 	|No 	|<:func>|Yes		|
 
 ## Variables
 Anything can be stored in a variable, including all of the above types. Variables are dynamically typed, dynamically scoped, and case sensitive.
@@ -79,11 +80,12 @@ To set a variable, the Set function can be used, followed by a name and a value.
 This will return and give x the value 3 in the current scope. Using the set command, all variables are immutable, and cannot be changed. However, variables can be reassigned by replacing Set with Mutate.
 
 ## Constants
-There are a few useful system constants
+There are a few useful system constants,
+they should all be pretty obvious.
 ```
-true -> 1
-false -> 0
-newline -> \n
+true
+false
+newline
 ```
 
 ## Functions

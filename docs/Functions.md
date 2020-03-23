@@ -1,6 +1,6 @@
 # Functions
 Full list of builtin functions, ordered in the same vauge way as in the code.
-All are case sensitive, a Bool is just a number.
+All are case sensitive.
 
 Name 	|Return |Arguments 			|Description									|
 ----	|----	|----				|----											|
@@ -15,6 +15,7 @@ Name 	|Return |Arguments 			|Description									|
 <=		|Bool 	|\[Num\] 			|Less than or equal 							|
 ==		|Bool	|\[Any\]			|Is equal 										|
 \!=		|Bool	|\[Any\]			|Is not equal 									|
+Type	|String |Any 				|Returns string representing type of object 	|
 Join	|String	|\[String\],<String>|Concat strings together with delimeter			|
 Append	|\[Any\]|\[\[Any\]\]		|Append lists together 							|
 Seq		|\[Num\]|Num,Num 			|List numbers from first to second 				|

@@ -31,26 +31,29 @@ using force_builtin = std::function<cell(Enviroment*, const cell&)>;
 #define LISTREMAINS sexpr args; if(pos != end && pos == --end) { args = env->list_eval(*pos); pos = args.begin(); end = args.end();} else end++
 #define CONVERTERROR(goal) throw std::domain_error("Cannot convert " + str_eval(c, true) + " to " + goal + " from type " + std::to_string(c.type))
 
-
 //Base data types
 #define EXPR 0
 #define FUNCTION 1
 #define STRING 2
-#define NUMBER 3
-#define CHAR 4
-#define LIST 5
+#define BOOL 3
+#define NUMBER 4
+#define CHAR 5
+#define LIST 6
+
+#define MAX_TYPE 15
 
 //Main data sructure
 struct cell {
-	int type;
-	std::variant<sexpr, string, int, builtin> content;
+	char type;
+	std::variant<sexpr, string, int, char, builtin> content;
 
 	//Constructors
 	cell() { cell(0); }
-	cell(string s, int t = STRING) : content{std::move(s)} { type = t; }
-	cell(int s, int t = NUMBER) : content{std::move(s)} { type = t; }
-	cell(sexpr s, int t = EXPR) : content{std::move(s)} { type = t; }
-	cell(builtin s, int t = FUNCTION) : content{std::move(s)} { type = t; }
+	cell(string s, char t = STRING) : content{std::move(s)} { type = t; }
+	cell(int s, char t = NUMBER) : content{std::move(s)} { type = t; }
+	cell(char s, char t = CHAR) : content{std::move(s)} { type = t; }
+	cell(sexpr s, char t = EXPR) : content{std::move(s)} { type = t; }
+	cell(builtin s, char t = FUNCTION) : content{std::move(s)} { type = t; }
 
 	friend bool operator==(const cell &first, const cell &second) {
 		return first.content == second.content;
@@ -78,7 +81,8 @@ private:
 	template <class T> cell arithmetic(T func);
 
 public:
-	force_builtin force_eval[15];
+	force_builtin force_eval[MAX_TYPE];
+	string type_name[MAX_TYPE];
 
 	//Variable retrieval
 	cell *get(string s);
@@ -91,7 +95,8 @@ public:
 
 	//Convert types
 	string str_eval(cell const &c, bool literal=false);
-	string str_print(cell const &c);
+	string str_print(cell const &c, bool literal=false);
+	bool bool_eval(cell const &c);
 	int num_eval(cell const &c);
 	char char_eval(cell const &c);
 	sexpr list_eval(cell const &c);
@@ -99,6 +104,7 @@ public:
 
 	//Allow additional type conversions
 	virtual string str_eval_cont(cell const &c, bool literal);
+	virtual bool bool_eval_cont(cell const &c);
 	virtual int num_eval_cont(cell const &c);
 	virtual char char_eval_cont(cell const &c);
 	virtual sexpr list_eval_cont(cell const &c);
