@@ -63,7 +63,7 @@ void Enviroment::shift_env(bool in) {
 //Base eval function
 cell Enviroment::eval(cell const &c) {
 	if(c.type == EXPR)
-		return std::visit([this](auto const &c) { return this->eval(c); }, c.content);
+		return std::visit([this](auto const &a) { return this->eval(a); }, c.content);
     if(c.type == STRING) {
     	cell *var = get(std::get<string>(c.content));
 		if(var != NULL)
