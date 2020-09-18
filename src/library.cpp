@@ -79,6 +79,13 @@ void Enviroment::build_library() {
 	set("<", comparitor(std::less<int>()));
 	set("<=", comparitor(std::less_equal<int>()));
 
+	//Not gate
+	set("Not", cell([](Enviroment *env, marker pos, marker end) {
+		bool b = env->bool_eval(*pos++);
+		DONE;
+		return cell(!b, BOOL);
+	}));
+
 	//Universal comparisons
 	set("==", cell([](Enviroment *env, marker pos, marker end) {
 		LISTREMAINS;

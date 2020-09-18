@@ -13,6 +13,7 @@ Name 	|Return |Arguments 			|Description									|
 \>=		|Bool 	|\[Num\] 			|Greater than or equal 							|
 <		|Bool 	|\[Num\] 			|Less than or equal 							|
 <=		|Bool 	|\[Num\] 			|Less than or equal 							|
+Not 	|Bool 	|Bool 				|Not gate 										|
 ==		|Bool	|\[Any\]			|Is equal 										|
 \!=		|Bool	|\[Any\]			|Is not equal 									|
 Type	|String |Any 				|Returns string representing type of object 	|
