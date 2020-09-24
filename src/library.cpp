@@ -83,7 +83,7 @@ void Enviroment::build_library() {
 	set("Not", cell([](Enviroment *env, marker pos, marker end) {
 		bool b = env->bool_eval(*pos++);
 		DONE;
-		return cell(!b, BOOL);
+		return cell((char)!b, BOOL);
 	}));
 
 	//Universal comparisons
@@ -111,7 +111,7 @@ void Enviroment::build_library() {
 		return env->type_name[(int)env->eval(*pos).type];
 	}));
 
-	//Advanced list to string conversion
+	//Special string functions
 	set("Join", cell([](Enviroment *env, marker pos, marker end) {
 		sexpr array = env->list_eval(*pos++);
 		string output;
@@ -127,6 +127,12 @@ void Enviroment::build_library() {
 
 		DONE;
 		return output;
+	}));
+	set("Print",  cell([](Enviroment *env, marker pos, marker end) {
+		string s = env->str_print(*pos++);
+		std::cout << s;
+		DONE;
+		return cell(s);
 	}));
 
 	//List building functions
@@ -317,7 +323,9 @@ void Enviroment::build_library() {
 	set("Mutate", cell([](Enviroment *env, marker pos, marker end) {
 		string name = env->str_print(*pos++);
 		cell output = env->set(name, *pos++);
+
 		DONE;
+		std::cout << name << " to " << env->str_print(output) << "\n";
 		return output;
 	}));
 }

@@ -1,1 +1,2 @@
 testargs=test.solisp
+output=../solisp

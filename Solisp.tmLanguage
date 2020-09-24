@@ -68,7 +68,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(If|Switch)\b</string>
+			<string>\b(If|Switch|Not)\b</string>
 			<key>name</key>
 			<string>keyword.control.solisp</string>
 		</dict>
@@ -98,7 +98,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(Standard|this|Start-Extra|GOAL|INPUT|OUTPUT|HIDDEN|BUTTON|MIRRORED|MULTI|CUSTOM)\b</string>
+			<string>\b(Standard|Jokers|this|prev|Start-Extra|GOAL|INPUT|OUTPUT|HIDDEN|BUTTON|MIRRORED|MULTI|CUSTOM)\b</string>
 			<key>name</key>
 			<string>constant.other.cardsolisp</string>
 		</dict>

@@ -20,8 +20,8 @@ builtin Enviroment::build_function(sexpr func) {
 			}
 
 			//Prevent infinite loops when setting variables
-			string s = env->str_print(c, true);
-			if(s != env->str_print(*pos, true))
+			string s = env->str_eval(c, true);
+			if(s != env->str_eval(*pos, true))
 				env->set(s, *pos++);
 		}
 
@@ -128,23 +128,13 @@ string Enviroment::str_eval_cont(cell const &c, bool literal) {
 	CONVERTERROR("string");
 }
 
-//Remove literal markers
 string Enviroment::str_print(cell const &c, bool literal) {
-	string s = str_eval(c, literal);
-	string out = "";
+	std::string s = str_eval(c, literal);
 
-	for(int i = 0; i < (int)s.length(); i++) {
-		if(s[i] == ':') {
-			if(i + 1 < (int)s.length() && s[i + 1] == ':') {
-				i++;
-				out += ':';
-			}
-		} else {
-			out += s[i];
-		}
-	}
-
-	return out;
+	//Remove : if used
+	if(s[0] == ':' && s[1] != ':')
+		return s.substr(1);
+	return s;
 }
 
 //Convert to boolean
