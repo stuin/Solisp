@@ -175,7 +175,8 @@ void Enviroment::build_library() {
 	set("Tail", cell([](Enviroment *env, marker pos, marker end) {
 		LISTREMAINS;
 		sexpr output;
-		++pos;
+		if(pos != end)
+			++pos;
 
 		//Copy all other cells
 		while(pos != end)
@@ -325,7 +326,6 @@ void Enviroment::build_library() {
 		cell output = env->set(name, *pos++);
 
 		DONE;
-		std::cout << name << " to " << env->str_print(output) << "\n";
 		return output;
 	}));
 }

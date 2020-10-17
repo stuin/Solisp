@@ -60,6 +60,16 @@ struct cell {
 	}
 };
 
+//Custom iterator for input
+class Iterator {
+public:
+	virtual void getline(std::string &line, bool prompt) {}
+	virtual bool eof() {
+		return false;
+	}
+	virtual void endline(std::string &line) {}
+};
+
 //Enviroment of system variables
 class Enviroment {
 private:
@@ -111,6 +121,7 @@ public:
 
 	//Public reader functions
 	cell read(const std::string & s);
+	cell read_stream(Iterator &in, int type, int new_line = -1);
 	cell read_stream(std::istream &in, int type, int new_line = -1);
 
 	//Comparisons with proper conversion

@@ -66,13 +66,10 @@ cell Enviroment::read(const std::string & s) {
 }
 
 //Read objects spanning multiple lines into one string
-cell Enviroment::read_stream(std::istream &in, int type, int new_line) {
+cell Enviroment::read_stream(Iterator &in, int type, int new_line) {
 	std::string object;
 	int levels = -1;
 	bool literal = false;
-
-	if(!in.good())
-		throw std::domain_error("File not found.");
 
 	if(new_line != -1)
 		start_line = new_line;
@@ -82,7 +79,7 @@ cell Enviroment::read_stream(std::istream &in, int type, int new_line) {
 	while((levels != 0 || object.length() < 1) && !in.eof()) {
 		bool comment = false;
 		std::string line;
-		std::getline(in, line);
+		in.getline(line, object.length() < 1);
 		end_line++;
 
 		if(line.length() > 0) {
@@ -128,6 +125,7 @@ cell Enviroment::read_stream(std::istream &in, int type, int new_line) {
 			if(in.eof() && levels != 0)
 				throw std::domain_error(std::to_string(levels) + " non matched parenthesis");
 
+			in.endline(object);
 			start_line = end_line;
 			return force_eval[type](this, eval(read(object)));
 		}
@@ -141,4 +139,26 @@ cell Enviroment::read_stream(std::istream &in, int type, int new_line) {
 
 	start_line = end_line;
 	return cell("");
+}
+
+//Handle normal streams
+class StreamIterator : public Iterator {
+	std::istream &in;
+
+public:
+	StreamIterator(std::istream &_in) : in(_in) {
+	}
+
+	void getline(std::string &line, bool prompt) {
+		std::getline(in, line);
+	}
+
+	bool eof() {
+		return in.eof();
+	}
+};
+
+cell Enviroment::read_stream(std::istream &in, int type, int new_line) {
+	StreamIterator it(in);
+	return read_stream(it, type, new_line);
 }

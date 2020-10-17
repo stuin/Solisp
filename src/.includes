@@ -1,2 +1,5 @@
-testargs=test.solisp
+testargs=../docs/test.solisp
 output=../solisp
+
+buildargs3=-leditline
+builder2=""
