@@ -269,6 +269,19 @@ void Enviroment::build_library() {
 
 		return cell(size);
 	}));
+	set("Get-Max", cell([](Enviroment *env, marker pos, marker end) {
+		int max = env->num_eval(*pos++);
+		LISTREMAINS;
+
+		//Check each cell
+		while(pos != end) {
+			int value = env->num_eval(*pos++);
+			if(value > max)
+				max = value;
+		}
+
+		return cell(max);
+	}));
 
 	//High level functions
 	set("Map", cell([](Enviroment *env, marker pos, marker end) {
@@ -307,6 +320,17 @@ void Enviroment::build_library() {
 		++pos;
 		DONE;
 		return cell(output, LIST);
+	}));
+	set("Repeat", cell([](Enviroment *env, marker pos, marker end) {
+		cell value = *pos++;
+		int count = 0;
+
+		//Re list each value
+		while(env->bool_eval(value))
+			++count;
+
+		DONE;
+		return cell(count);
 	}));
 
 	//Variable management
