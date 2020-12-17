@@ -34,7 +34,7 @@ builtin Enviroment::build_function(sexpr func) {
 //Variable retrieval
 cell *Enviroment::get(string s) {
 	//Check each enviroment layer for value
-	for(int i = current; i >= 0; i--) {
+	for(int i = vars.size() - 1; i >= 0; i--) {
 		auto it = vars[i].find(s);
 		if(it != vars[i].end())
 			return &(it->second);
@@ -45,7 +45,7 @@ cell *Enviroment::get(string s) {
 
 //Variable assginment
 cell Enviroment::set(string s, cell c) {
-	return vars[current][s] = c;
+	return vars.back()[s] = c;
 }
 
 //Shift enviroment
@@ -53,10 +53,18 @@ void Enviroment::shift_env(bool in) {
 	if(in) {
 		std::map<string, cell> lib;
 		vars.push_back(lib);
-		current++;
-	} else if(current > 1) {
+	} else if(vars.size() > 1) {
 		vars.pop_back();
-		current--;
+	}
+	//std::cout << "Moved to layer " << vars.size() << "\n";
+}
+
+//Print all env variables
+void Enviroment::print_env() {
+	for(int i = 0; i < (int)vars.size(); i++) {
+		std::cout << "Layer " << i << "\n";
+		for(auto mit = vars[i].begin(); mit != vars[i].end(); ++mit)
+		    std::cout << mit->first << " = " << str_print(mit->second) << "\n";
 	}
 }
 

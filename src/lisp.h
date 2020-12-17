@@ -74,7 +74,6 @@ public:
 class Enviroment {
 private:
 	int start_line = 0;
-	int current = -1;
 	std::vector<std::map<string, cell>> vars;
 
 	//Library structure
@@ -98,6 +97,7 @@ public:
 	cell *get(string s);
 	cell set(string s, cell c);
 	void shift_env(bool in);
+	void print_env();
 
 	//Base eval functions
 	cell eval(cell const &c);

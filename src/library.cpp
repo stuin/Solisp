@@ -270,8 +270,8 @@ void Enviroment::build_library() {
 		return cell(size);
 	}));
 	set("Get-Max", cell([](Enviroment *env, marker pos, marker end) {
-		int max = env->num_eval(*pos++);
 		LISTREMAINS;
+		int max = env->num_eval(*pos++);
 
 		//Check each cell
 		while(pos != end) {
