@@ -74,7 +74,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>(((\B\-)?\b[0-9]+)\b)|(\b(true|false)\b)</string>
+			<string>(((\B\-)?\b[0-9]+)\b)|(\b(true|false|newline)\b)</string>
 			<key>name</key>
 			<string>constant.numeric.solisp</string>
 		</dict>
@@ -98,7 +98,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(Standard|Jokers|this|prev|Start-Extra|GOAL|INPUT|OUTPUT|HIDDEN|BUTTON|MIRRORED|MULTI|CUSTOM)\b</string>
+			<string>\b(Standard|Jokers|this|prev|Start-Extra|GOAL|INPUT|OUTPUT|HIDDEN|BUTTON|SWAP|MIRRORED|MULTI|CUSTOM)\b</string>
 			<key>name</key>
 			<string>constant.other.cardsolisp</string>
 		</dict>
