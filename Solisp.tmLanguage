@@ -98,7 +98,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>\b(Standard|Jokers|this|prev|Start-Extra|GOAL|INPUT|OUTPUT|HIDDEN|BUTTON|SWAP|MIRRORED|MULTI|CUSTOM)\b</string>
+			<string>\b(Standard|Jokers|this|prev|Start-Extra|GOAL|NOPLACE|NOGRAB|HIDDEN|BUTTON|SWAP|MIRRORED|MULTI|CUSTOM)\b</string>
 			<key>name</key>
 			<string>constant.other.cardsolisp</string>
 		</dict>

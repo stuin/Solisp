@@ -269,16 +269,6 @@ void Enviroment::build_library() {
 
 		return cell(size);
 	}));
-	set("Sum", cell([](Enviroment *env, marker pos, marker end) {
-		int sum = 0;
-		LISTREMAINS;
-
-		//Count all other cells
-		while(pos != end)
-			sum += env->num_eval(*pos++);
-
-		return cell(sum);
-	}));
 	set("Get-Max", cell([](Enviroment *env, marker pos, marker end) {
 		LISTREMAINS;
 		int max = env->num_eval(*pos++);
