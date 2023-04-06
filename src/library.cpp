@@ -285,7 +285,7 @@ void Enviroment::build_library() {
 
 	//High level functions
 	set("Map", cell([](Enviroment *env, marker pos, marker end) {
-		string var = env->str_print(*pos++);
+		string var = env->str_print(*pos++, true);
 		sexpr array = env->list_eval(*pos++);
 		sexpr output;
 		env->shift_env(true);
@@ -302,8 +302,8 @@ void Enviroment::build_library() {
 		return cell(output, LIST);
 	}));
 	set("MapI", cell([](Enviroment *env, marker pos, marker end) {
-		string var = env->str_print(*pos++);
-		string index = env->str_eval(*pos++, true);
+		string var = env->str_print(*pos++, true);
+		string index = env->str_eval(*pos++);
 		sexpr array = env->list_eval(*pos++);
 		sexpr output;
 		env->shift_env(true);
