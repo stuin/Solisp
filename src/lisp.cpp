@@ -19,10 +19,8 @@ builtin Enviroment::build_function(sexpr func) {
 				DONE;
 			}
 
-			//Prevent infinite loops when setting variables
-			string s = env->str_eval(c, true);
-			if(s != env->str_eval(*pos, true))
-				env->set(s, *pos++);
+			string s = env->name_eval(c);
+			env->set(s, *pos++);
 		}
 
 		cell output = env->eval(func[1]);
@@ -64,7 +62,7 @@ void Enviroment::print_env() {
 	for(int i = 0; i < (int)vars.size(); i++) {
 		std::cout << "Layer " << i << "\n";
 		for(auto mit = vars[i].begin(); mit != vars[i].end(); ++mit)
-		    std::cout << mit->first << " = " << str_print(mit->second) << "\n";
+		    std::cout << mit->first << " = " << str_eval(mit->second) << "\n";
 	}
 }
 
@@ -72,11 +70,11 @@ void Enviroment::print_env() {
 cell Enviroment::eval(cell const &c) {
 	if(c.type == EXPR)
 		return std::visit([this](auto const &a) { return this->eval(a); }, c.content);
-    if(c.type == STRING) {
-    	cell *var = get(std::get<string>(c.content));
+	if(c.type == NAME) {
+		cell *var = get(std::get<string>(c.content));
 		if(var != NULL)
-			return *var;
-    }
+			return eval(*var);
+	}
     return c;
 }
 
@@ -89,69 +87,83 @@ cell Enviroment::eval(sexpr const &s) {
 	return eval(function_eval(*s.begin())(this, ++s.begin(), s.end()));
 }
 
-//Convert to string
-string Enviroment::str_eval(cell const &c, bool literal) {
-	if((c.type == EXPR && !literal))
-		return str_eval(eval(c));
+string Enviroment::name_eval(cell const &c) {
+	string output;
+	sexpr array;
+	switch(c.type) {
+		case EXPR:
+			return name_eval(eval(c));
+		case LIST:
+			array = std::get<sexpr>(c.content);
+			for(cell s : array)
+				output += str_eval(s);
+			return output;
+		case CHAR:
+			return string(1, std::get<char>(c.content));
+		case STRING: case NAME:
+			return std::get<string>(c.content);
+	}
 
+	return name_eval_cont(c);
+}
+
+string Enviroment::name_eval_cont(cell const &c) {
+	CONVERTERROR("Name");
+}
+
+//Convert to string
+string Enviroment::str_eval(cell const &c) {
 	string output;
 	sexpr array;
 	cell *var;
 	switch(c.type) {
+		case EXPR:
+			return str_eval(eval(c));
+		case STRING:
+			return std::get<string>(c.content);
 		case BOOL:
-			return (bool)std::get<char>(c.content) ? ":true" : ":false";
+			return (bool)std::get<char>(c.content) ? "true" : "false";
 		case NUMBER:
 			return std::to_string(std::get<int>(c.content));
 		case FUNCTION:
-			return "<:func>";
-		case LIST: case EXPR:
+			return "<func>";
+		case LIST:
 			array = std::get<sexpr>(c.content);
 			for(cell s : array)
-				output += str_eval(s, literal) + " ";
+				output += str_eval(s);
 			return output;
 		case CHAR:
-			output = string(1, std::get<char>(c.content));
-
-			//Check if variable
-			var = get(output);
-			if(!literal && var != NULL)
-				return str_eval(*var);
-
-			return output;
-		case STRING:
+			return string(1, std::get<char>(c.content));
+		case NAME:
 			output = std::get<string>(c.content);
 
 			//Check if variable
 			var = get(output);
-			if(!literal && var != NULL)
+			if(var != NULL)
 				return str_eval(*var);
 
 			return output;
 	}
 
-	return str_eval_cont(c, literal);
+	return str_eval_cont(c);
 }
 
-string Enviroment::str_eval_cont(cell const &c, bool literal) {
-	CONVERTERROR("string");
-}
-
-string Enviroment::str_print(cell const &c, bool literal) {
-	std::string s = str_eval(c, literal);
-
-	//Remove : if used
-	if(s[0] == ':' && s[1] != ':')
-		return s.substr(1);
-	return s;
+string Enviroment::str_eval_cont(cell const &c) {
+	CONVERTERROR("String");
 }
 
 //Convert to boolean
 bool Enviroment::bool_eval(cell const &c) {
+	cell *var;
 	switch(c.type) {
 		case EXPR:
 			return bool_eval(eval(c));
 		case BOOL:
 			return (bool)std::get<char>(c.content);
+		case NAME:
+			var = get(std::get<string>(c.content));
+			if(var != NULL)
+				return bool_eval(*var);
 		case NUMBER: case CHAR: case STRING:
 			return (bool)num_eval(c);
 	}
@@ -160,44 +172,37 @@ bool Enviroment::bool_eval(cell const &c) {
 }
 
 bool Enviroment::bool_eval_cont(cell const &c) {
-	CONVERTERROR("bool");
+	CONVERTERROR("Bool");
 }
 
 //Convert to number
 int Enviroment::num_eval(cell const &c) {
 	cell *var;
+	string s;
 	switch(c.type) {
 		case EXPR:
 			return num_eval(eval(c));
 		case NUMBER:
 			return std::get<int>(c.content);
 		case CHAR: case BOOL:
-			//Check if variable
-			var = get(string(1, std::get<char>(c.content)));
+			return std::get<char>(c.content);
+		case NAME:
+			var = get(std::get<string>(c.content));
 			if(var != NULL)
 				return num_eval(*var);
-
-			return std::get<char>(c.content);
 		case STRING:
-			string s = std::get<string>(c.content);
+			s = std::get<string>(c.content);
 
 			//If numerical string
 			if(isdigit(s[0]) || s[0] == '-')
 				return std::stoi(s);
-
-			//Check if variable
-			var = get(s);
-			if(var != NULL)
-				return num_eval(*var);
-
-			throw std::domain_error("No variable or value found for " + s);
 	}
 
 	return num_eval_cont(c);
 }
 
 int Enviroment::num_eval_cont(cell const &c) {
-	CONVERTERROR("number");
+	CONVERTERROR("Number");
 }
 
 //Convert to char
@@ -209,31 +214,23 @@ char Enviroment::char_eval(cell const &c) {
 		case NUMBER:
 			return std::get<int>(c.content);
 		case CHAR: case BOOL:
-			//Check if variable
-			var = get(string(1, std::get<char>(c.content)));
+			return std::get<char>(c.content);
+		case NAME:
+			var = get(std::get<string>(c.content));
 			if(var != NULL)
 				return char_eval(*var);
-
-			return std::get<char>(c.content);
 		case STRING:
 			//Check if short enough
 			string s = std::get<string>(c.content);
 			if(s.length() == 1)
 				return s[0];
-
-			//Check if variable
-			var = get(s);
-			if(var != NULL)
-				return char_eval(*var);
-
-			throw std::domain_error("Cannot convert to char from multi-char string");
 	}
 
 	return char_eval_cont(c);
 }
 
 char Enviroment::char_eval_cont(cell const &c) {
-	CONVERTERROR("char");
+	CONVERTERROR("Char");
 }
 
 //Convert to list
@@ -244,19 +241,12 @@ sexpr Enviroment::list_eval(cell const &c) {
 			return list_eval(eval(c));
 		case LIST:
 			return std::get<sexpr>(c.content);
-		case CHAR:
-			//Check if variable
-			var = get(string(1, std::get<char>(c.content)));
+		case NAME:
+			var = get(std::get<string>(c.content));
 			if(var != NULL)
 				return list_eval(*var);
-			break;
 		case STRING:
 			string s = std::get<string>(c.content);
-
-			//Check if variable
-			var = get(s);
-			if(var != NULL)
-				return list_eval(*var);
 
 			//Convert string to char list
 			sexpr output;
@@ -283,20 +273,18 @@ builtin Enviroment::function_eval(cell const &c) {
 			return function_eval(eval(c));
 		case FUNCTION:
 			return std::get<builtin>(c.content);
-		case STRING:
-			//Check if variable
+		case LIST:
+			return build_function(std::get<sexpr>(c.content));
+		case NAME:
 			var = get(std::get<string>(c.content));
 			if(var != NULL)
 				return function_eval(*var);
-		case CHAR:
-			//Check if variable
-			var = get(string(1, std::get<char>(c.content)));
-			if(var != NULL)
-				return function_eval(*var);
-		case LIST:
-			return build_function(std::get<sexpr>(c.content));
 	}
-	CONVERTERROR("function");
+	return function_eval_cont(c);
+}
+
+builtin Enviroment::function_eval_cont(cell const &c) {
+	CONVERTERROR("Function");
 }
 
 //Compare two cells

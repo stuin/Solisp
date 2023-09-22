@@ -18,13 +18,14 @@ std::list<std::string> Enviroment::tokenize(const std::string & str) {
             tokens.push_back(*s++ == '{' ? "{" : "}");
         else if(*s == '"') {
         	//Get full string
-        	const char *t = ++s;
+        	const char *t = s;
+        	++t;
             while(*t && *t != '"')
                 ++t;
             tokens.push_back(std::string(s, t));
             s = ++t;
         } else {
-            const char * t = s;
+            const char *t = s;
             while(*t && *t != ' ' && *t != '(' && *t != ')' && *t != '{' && *t != '}')
                 ++t;
             tokens.push_back(std::string(s, t));
@@ -34,13 +35,15 @@ std::list<std::string> Enviroment::tokenize(const std::string & str) {
     return tokens;
 }
 
-//Numbers become Numbers; every other token is a String or char
+//Numbers become Numbers; every other token is a Name, String, or char
 cell Enviroment::atom(const std::string & token) {
     if(isdigit(token[0]) || (token[0] == '-' && isdigit(token[1])))
         return cell(stoi(token));
-    if(token.length() == 1)
-    	return cell(token[0], CHAR);
-    return cell(token);
+    if(token[0] == '"' && token.length() > 2)
+    	return cell(token.substr(1, token.length() - 1));
+    if(token[0] == '"')
+    	return cell(token[1], CHAR);
+    return cell(token, NAME);
 }
 
 //Return the Lisp expression in the given tokens
@@ -78,6 +81,7 @@ cell Enviroment::read_stream(Iterator &in, int type, int new_line) {
 	//For each incomplete line
 	while((levels != 0 || object.length() < 1) && !in.eof()) {
 		bool comment = false;
+		bool slash = false;
 		std::string line;
 		in.getline(line, object.length() < 1);
 		end_line++;
@@ -88,7 +92,7 @@ cell Enviroment::read_stream(Iterator &in, int type, int new_line) {
 
 			//For each letter
 			for(char c : line) {
-				if(!literal && !comment) {
+				if(!comment && !literal) {
 					//Count parenthesis and lists
 					if(c == '(' || c == '{') {
 						levels++;
@@ -101,14 +105,32 @@ cell Enviroment::read_stream(Iterator &in, int type, int new_line) {
 					}
 				}
 
-				if(c == '"')
-					literal = !literal;
-
-				//Add other character
-				if(c == '\t')
-					object += ' ';
-				else if(!comment)
-					object += c;
+				if(!comment) {
+					if(slash) {
+						switch(c) {
+						case 'n':
+							object += '\n';
+							break;
+						case 'r':
+							object += '\r';
+							break;
+						case 't':
+							object += '\t';
+							break;
+						default:
+							object += c;
+						}
+						slash = false;
+					} else if(c == '"') {
+						literal = !literal;
+						object += c;
+					} else if(c == '\t')
+						object += ' ';
+					else if(c == '\\')
+						slash = true;
+					else
+						object += c;
+				}
 			}
 			if(!comment)
 				object += ' ';

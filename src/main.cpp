@@ -50,9 +50,9 @@ int main(int argc, char const *argv[])
 		//Run actual file
 		std::ifstream infile(argv[1]);
 		if(infile.good()) {
-			std::cout << env.str_print(env.read_stream(infile, STRING));
+			std::cout << env.str_eval(env.read_stream(infile, STRING));
 			while(!infile.eof())
-				std::cout << "\n" << env.str_print(env.read_stream(infile, STRING));
+				std::cout << "\n" << env.str_eval(env.read_stream(infile, STRING));
 		}
 		infile.close();
 	} else {
@@ -64,7 +64,7 @@ int main(int argc, char const *argv[])
 		EditIterator it;
 
 		while(!it.eof()) {
-			std::cout << env.str_print(env.read_stream(it, STRING)) << "\n";
+			std::cout << env.str_eval(env.read_stream(it, STRING)) << "\n";
 		}
 
 		write_history(".solisp_history");

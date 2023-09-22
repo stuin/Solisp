@@ -39,9 +39,13 @@ void Enviroment::build_library() {
 	force_eval[EXPR] = [](Enviroment *env, cell const &c) {
 		return c;
 	};
+	type_name[NAME] = "Name";
+	force_eval[NAME] = [](Enviroment *env, cell const &c) {
+		return cell(env->name_eval(c), NAME);
+	};
 	type_name[STRING] = "String";
 	force_eval[STRING] = [](Enviroment *env, cell const &c) {
-		return cell(env->str_eval(c, false), STRING);
+		return cell(env->str_eval(c), STRING);
 	};
 	type_name[BOOL] = "Boolean";
 	force_eval[BOOL] = [](Enviroment *env, cell const &c) {
@@ -64,7 +68,6 @@ void Enviroment::build_library() {
 	set("true", cell((char)1, BOOL));
 	set("false", cell((char)0, BOOL));
 	set("newline", cell("\n"));
-	set("\\n", cell("\n"));
 
 	//Basic arithmatic
 	set("+", arithmetic(std::plus<int>()));
@@ -110,8 +113,29 @@ void Enviroment::build_library() {
 	set("Type", cell([](Enviroment *env, marker pos, marker end) {
 		return env->type_name[(int)env->eval(*pos).type];
 	}));
+	set("Force", cell([](Enviroment *env, marker pos, marker end) {
+		string type = env->name_eval(*pos++);
 
-	//Special string functions
+		for(int i = 0; i < MAX_TYPE; i++)
+			if(env->type_name[i] == type)
+				return env->force_eval[i](env, *pos++);
+		throw std::domain_error("Type " + type + " not found");
+	}));
+
+	//String functions
+	set("JoinD", cell([](Enviroment *env, marker pos, marker end) {
+		string delim = env->str_eval(*pos++);
+		LISTREMAINS;
+		string output;
+
+		//Perform actual appending
+		while(pos != end)
+			output += env->str_eval(*pos++) + delim;
+
+		DONE;
+		return output;
+	}));
+	//Old join function, deprecated because of argument ordering
 	set("Join", cell([](Enviroment *env, marker pos, marker end) {
 		sexpr array = env->list_eval(*pos++);
 		string output;
@@ -123,13 +147,13 @@ void Enviroment::build_library() {
 
 		//Perform actual appending
 		for(cell s : array)
-			output += env->str_eval(s, false) + delim;
+			output += env->str_eval(s) + delim;
 
 		DONE;
 		return output;
 	}));
 	set("Print",  cell([](Enviroment *env, marker pos, marker end) {
-		string s = env->str_print(*pos++);
+		string s = env->str_eval(*pos++);
 		std::cout << s;
 		DONE;
 		return cell(s);
@@ -269,7 +293,7 @@ void Enviroment::build_library() {
 
 		return cell(size);
 	}));
-	set("Get-Max", cell([](Enviroment *env, marker pos, marker end) {
+	set("Max", cell([](Enviroment *env, marker pos, marker end) {
 		LISTREMAINS;
 		int max = env->num_eval(*pos++);
 
@@ -285,7 +309,7 @@ void Enviroment::build_library() {
 
 	//High level functions
 	set("Map", cell([](Enviroment *env, marker pos, marker end) {
-		string var = env->str_print(*pos++, true);
+		string var = env->name_eval(*pos++);
 		sexpr array = env->list_eval(*pos++);
 		sexpr output;
 		env->shift_env(true);
@@ -302,8 +326,8 @@ void Enviroment::build_library() {
 		return cell(output, LIST);
 	}));
 	set("MapI", cell([](Enviroment *env, marker pos, marker end) {
-		string var = env->str_print(*pos++, true);
-		string index = env->str_eval(*pos++);
+		string var = env->name_eval(*pos++);
+		string index = env->name_eval(*pos++);
 		sexpr array = env->list_eval(*pos++);
 		sexpr output;
 		env->shift_env(true);
@@ -335,7 +359,7 @@ void Enviroment::build_library() {
 
 	//Variable management
 	set("Set", cell([](Enviroment *env, marker pos, marker end) {
-		string name = env->str_print(*pos++);
+		string name = env->name_eval(*pos++);
 
 		//Check for existing value
 		if(env->get(name) != NULL)
@@ -346,7 +370,7 @@ void Enviroment::build_library() {
 		return output;
 	}));
 	set("Mutate", cell([](Enviroment *env, marker pos, marker end) {
-		string name = env->str_print(*pos++);
+		string name = env->name_eval(*pos++);
 		cell output = env->set(name, *pos++);
 
 		DONE;

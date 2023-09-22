@@ -8,40 +8,58 @@
 	(* 5 1)
 	(/ 20 4)
 	(% 15 10)
-) Passed Fail)
+) "Passed" "Fail")
 
 #Building and summing up lists
 (If (< (+ (Set list (Seq 1 5))) 20) #{+ 1 2 3 4 5}
-Passed Fail)
+"Passed" "Fail")
 
 #Mapping loops and product of a list
 (If (* (Map x list (!= x 0)))
-Passed Fail)
+"Passed" "Fail")
 
 #Alternate map function
 (If (* (MapI x i list (> x i)))
-Passed Fail)
+"Passed" "Fail")
+
+#Manual types
+(If (== (Force Number "*") 42)
+"Passed" "Fail")
 
 #General list modifying
-(Join (Remove , (Join (Reverse "e,d" s s a P) ,)))
+(Remove "," (JoinD "," (Reverse "e,d" "s" "s" "a" "P")))
 
 #Step
-(Step (Set start Pass) (Join {start ed}))
+(Step (Set start "Pass") {start "ed"})
 
 #Switch statement
 (Switch
-	{(== 5 3) Fail1}
-	{(> 6 10) Fail2}
-	{(!= 3 1) Passed}
-	{(< 3 0) Fail3}
-	{True Fail4}
+	{(== 5 3) "Fail1"}
+	{(> 6 10) "Fail2"}
+	{(!= 3 1) "Passed"}
+	{(< 3 0) "Fail3"}
+	{True "Fail4"}
+)
+
+#Name vs String
+(Step
+	(Set Fail "Pass")
+	(Set e "Fail")
+	{Fail "e" d}
+)
+
+#Constructed Names
+(Step
+	(Set "F1" "Pass")
+	(Set {"F" (+ 1 1)} "ed")
+	{(Force Name "F1") (Force Name {"F" 2})}
 )
 
 #Basic user-defined function
 (If (== (
 	{{x y} (+ x y)}
 2 3) 5)
-Passed Fail)
+"Passed" "Fail")
 
 #Succesfull recursive function
 (If (== ((Set fact {
@@ -51,11 +69,11 @@ Passed Fail)
 		0
 	)
 }) 4) 10)
-Passed Fail)
+"Passed" "Fail")
 
 #Weird formatting test
 (If#Testing
-1(Join 		 {Pass ed})"Fail"
+1{"Pass" "ed"}"Fail"
 )
 
 args

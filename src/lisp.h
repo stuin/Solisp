@@ -27,20 +27,21 @@ using builtin = std::function<auto(Enviroment*, marker, marker)->cell>;
 using force_builtin = std::function<cell(Enviroment*, const cell&)>;
 
 //General function macros
-#define DONE if(pos != end) throw std::domain_error("Too many arguments: " + env->str_eval(*pos, true))
+#define DONE if(pos != end) throw std::domain_error("Too many arguments: " + env->name_eval(*pos))
 #define LISTREMAINS sexpr args; if(pos != end && pos == --end) { args = env->list_eval(*pos); pos = args.begin(); end = args.end();} else end++
-#define CONVERTERROR(goal) throw std::domain_error("Cannot convert " + str_eval(c, true) + " to " + goal + " from type " + std::to_string(c.type))
+#define CONVERTERROR(goal) throw std::domain_error("Cannot convert " + name_eval(c) + " to " + goal + " from type " + type_name[(int)c.type])
 
 //Base data types
 #define EXPR 0
 #define FUNCTION 1
-#define STRING 2
-#define BOOL 3
-#define NUMBER 4
-#define CHAR 5
-#define LIST 6
+#define NAME 2
+#define STRING 3
+#define BOOL 4
+#define NUMBER 5
+#define CHAR 6
+#define LIST 7
 
-#define MAX_TYPE 15
+#define MAX_TYPE 20
 
 //Main data sructure
 struct cell {
@@ -104,8 +105,8 @@ public:
 	cell eval(sexpr const &c);
 
 	//Convert types
-	string str_eval(cell const &c, bool literal=false);
-	string str_print(cell const &c, bool literal=false);
+	string name_eval(cell const &c);
+	string str_eval(cell const &c);
 	bool bool_eval(cell const &c);
 	int num_eval(cell const &c);
 	char char_eval(cell const &c);
@@ -113,11 +114,13 @@ public:
 	builtin function_eval(cell const &c);
 
 	//Allow additional type conversions
-	virtual string str_eval_cont(cell const &c, bool literal);
+	virtual string name_eval_cont(cell const &c);
+	virtual string str_eval_cont(cell const &c);
 	virtual bool bool_eval_cont(cell const &c);
 	virtual int num_eval_cont(cell const &c);
 	virtual char char_eval_cont(cell const &c);
 	virtual sexpr list_eval_cont(cell const &c);
+	virtual builtin function_eval_cont(cell const &c);
 
 	//Public reader functions
 	cell read(const std::string & s);
