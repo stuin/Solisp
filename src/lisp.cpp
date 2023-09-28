@@ -62,7 +62,7 @@ void Enviroment::print_env() {
 	for(int i = 0; i < (int)vars.size(); i++) {
 		std::cout << "Layer " << i << "\n";
 		for(auto mit = vars[i].begin(); mit != vars[i].end(); ++mit)
-		    std::cout << mit->first << " = " << str_eval(mit->second) << "\n";
+		    std::cout << mit->first << " = " << str_eval(mit->second, true) << "\n";
 	}
 }
 
@@ -112,13 +112,19 @@ string Enviroment::name_eval_cont(cell const &c) {
 }
 
 //Convert to string
-string Enviroment::str_eval(cell const &c) {
+string Enviroment::str_eval(cell const &c, bool literal) {
 	string output;
 	sexpr array;
 	cell *var;
 	switch(c.type) {
 		case EXPR:
-			return str_eval(eval(c));
+			if(!literal)
+				return str_eval(eval(c));
+		case LIST:
+			array = std::get<sexpr>(c.content);
+			for(cell s : array)
+				output += str_eval(s);
+			return output;
 		case STRING:
 			return std::get<string>(c.content);
 		case BOOL:
@@ -127,11 +133,6 @@ string Enviroment::str_eval(cell const &c) {
 			return std::to_string(std::get<int>(c.content));
 		case FUNCTION:
 			return "<func>";
-		case LIST:
-			array = std::get<sexpr>(c.content);
-			for(cell s : array)
-				output += str_eval(s);
-			return output;
 		case CHAR:
 			return string(1, std::get<char>(c.content));
 		case NAME:
@@ -139,16 +140,16 @@ string Enviroment::str_eval(cell const &c) {
 
 			//Check if variable
 			var = get(output);
-			if(var != NULL)
+			if(!literal && var != NULL)
 				return str_eval(*var);
 
 			return output;
 	}
 
-	return str_eval_cont(c);
+	return str_eval_cont(c, literal);
 }
 
-string Enviroment::str_eval_cont(cell const &c) {
+string Enviroment::str_eval_cont(cell const &c, bool literal) {
 	CONVERTERROR("String");
 }
 
@@ -275,7 +276,7 @@ builtin Enviroment::function_eval(cell const &c) {
 			return std::get<builtin>(c.content);
 		case LIST:
 			return build_function(std::get<sexpr>(c.content));
-		case NAME:
+		case NAME: case STRING:
 			var = get(std::get<string>(c.content));
 			if(var != NULL)
 				return function_eval(*var);

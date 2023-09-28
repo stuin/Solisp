@@ -106,7 +106,7 @@ public:
 
 	//Convert types
 	string name_eval(cell const &c);
-	string str_eval(cell const &c);
+	string str_eval(cell const &c, bool literal=false);
 	bool bool_eval(cell const &c);
 	int num_eval(cell const &c);
 	char char_eval(cell const &c);
@@ -115,7 +115,7 @@ public:
 
 	//Allow additional type conversions
 	virtual string name_eval_cont(cell const &c);
-	virtual string str_eval_cont(cell const &c);
+	virtual string str_eval_cont(cell const &c, bool literal=false);
 	virtual bool bool_eval_cont(cell const &c);
 	virtual int num_eval_cont(cell const &c);
 	virtual char char_eval_cont(cell const &c);

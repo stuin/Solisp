@@ -43,8 +43,10 @@ int main(int argc, char const *argv[])
 		int i = 2;
 
 		//Copy arguments into env variable
-		while(i < argc)
-			args.push_back(env.read(argv[i++]));
+		while(i < argc) {
+			string s = argv[i++];
+			args.push_back(env.read('"' + s + '"'));
+		}
 		env.set("args", cell(args, LIST));
 
 		//Run actual file
